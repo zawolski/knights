@@ -1,3 +1,5 @@
+import time
+
 class space:
     def __init__(self, num, x_pos, y_pos):
         self.num = num
@@ -7,9 +9,9 @@ class space:
         self.occupant = 0
 
 class piece:
-    def __init__(self, name, move_list):
+    def __init__(self, name):
         self.name = name
-        self.moves = move_list
+        self.moves = []
 
 class knight(piece):
     def __init__(self):
@@ -132,63 +134,108 @@ def play(n, grid, spaces, players_list):
         player = (player + 1) % player_count
 
 
-n = 60
-grid, spaces = make_spiral(n)
+def outcome_2_knights(n):
+    grid, spaces = make_spiral(n)
+
+    plist = []
+    plist.append(knight())
+    plist.append(knight())
+
+    play(n, grid, spaces, plist)
+
+    for i in range(n):
+        for j in range(n):
+            grid[i][j] = 0
+
+    for i in range(n ** 2):
+        y = spaces[i].y
+        x = spaces[i].x 
+        grid[y][x] = spaces[i].occupant
+
+    return grid
+
+def outcome_6_knights(n):
+    grid, spaces = make_spiral(n)
+
+    plist = []
+    plist.append(knight())
+    plist.append(knight())
+    plist.append(knight())
+    plist.append(knight())
+    plist.append(knight())
+    plist.append(knight())
+
+    play(n, grid, spaces, plist)
+
+    for i in range(n):
+        for j in range(n):
+            grid[i][j] = 0
+
+    for i in range(n ** 2):
+        y = spaces[i].y
+        x = spaces[i].x 
+        grid[y][x] = spaces[i].occupant
+
+    return grid
+
+# n = 230
+# grid = outcome_2_knights(n)
+# # grid, spaces = make_spiral(n)
+# # for line in grid:
+# #     out = ""
+# #     for item in line:
+# #         thing = int(item)
+# #         out += f"{thing:03d}" + " "
+# #     print(out)
+
+# # for i in range(n ** 2):
+# #     print(f"{i}, {spaces[i].pos}")
+
+# # print(spaces[0].pos)
+
+# # tknight = knight()
+# # print(tknight.moves)
+
+# # print(check_bounds(n, (2,2), tknight.moves))
+
+# # plist = []
+# # plist.append(knight())
+# # plist.append(knight())
+# # # plist.append(knight())
+# # # plist.append(knight())
+
+# # play(n, grid, spaces, plist)
+
+# # # for i in range(n ** 2):
+# # #     print(f"{i}, {spaces[i].occupant}")
+
+# # # for line in grid:
+# # #     out = ""
+# # #     for item in line:
+# # #         thing = int(item)
+# # #         out += f"{thing:02d}" + " "
+# # #     print(out)
+
+# # for i in range(n):
+# #     for j in range(n):
+# #         grid[i][j] = 0
+
+# # for i in range(n ** 2):
+# #     y = spaces[i].y
+# #     x = spaces[i].x 
+# #     grid[y][x] = spaces[i].occupant
+
 # for line in grid:
-#     out = ""
+#     #out = ""
 #     for item in line:
-#         thing = int(item)
-#         out += f"{thing:03d}" + " "
-#     print(out)
-
-# for i in range(n ** 2):
-#     print(f"{i}, {spaces[i].pos}")
-
-# print(spaces[0].pos)
-
-# tknight = knight()
-# print(tknight.moves)
-
-# print(check_bounds(n, (2,2), tknight.moves))
-
-plist = []
-plist.append(knight())
-plist.append(knight())
-# plist.append(knight())
-# plist.append(knight())
-
-play(n, grid, spaces, plist)
-
-# for i in range(n ** 2):
-#     print(f"{i}, {spaces[i].occupant}")
-
-# for line in grid:
-#     out = ""
-#     for item in line:
-#         thing = int(item)
-#         out += f"{thing:02d}" + " "
-#     print(out)
-
-for i in range(n):
-    for j in range(n):
-        grid[i][j] = 0
-
-for i in range(n ** 2):
-    y = spaces[i].y
-    x = spaces[i].x 
-    grid[y][x] = spaces[i].occupant
-
-for line in grid:
-    #out = ""
-    for item in line:
-        if int(item) == 0:
-            print(item, end = "")
-        if int(item) == 1:
-            print(f"{'\033[31m'}{item}{'\033[0m'}", end = "")
-        if int(item) == 2:
-            print(f"{'\033[32m'}{item}{'\033[0m'}", end = "")
-        if int(item) == 3:
-            print(f"{'\033[33m'}{item}{'\033[0m'}", end = "")
-        if int(item) == 4:
-            print(f"{'\033[34m'}{item}{'\033[0m'}", end = "")
-    print("")
+#         if int(item) == 0:
+#             print(item, end = "")
+#         if int(item) == 1:
+#             print(f"{'\033[31m'}{item}{'\033[0m'}", end = "")
+#         if int(item) == 2:
+#             print(f"{'\033[32m'}{item}{'\033[0m'}", end = "")
+#         if int(item) == 3:
+#             print(f"{'\033[33m'}{item}{'\033[0m'}", end = "")
+#         if int(item) == 4:
+#             print(f"{'\033[34m'}{item}{'\033[0m'}", end = "")
+#     print("")
