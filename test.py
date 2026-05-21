@@ -1,4 +1,5 @@
 import time
+import os
 
 class space:
     def __init__(self, num, x_pos, y_pos):
@@ -25,6 +26,33 @@ class knight(piece):
             (-1, 2),
             (1, -2),
             (-1, -2)
+        ]
+
+class tester1(piece):
+    def __init__(self):
+        self.name = "tester1"
+        self.moves = [
+            (3, 1),
+        ]
+
+class elephant(piece):
+    def __init__(self):
+        self.name = elephant
+        self.moves = [
+            (2, 2),
+            (-2, 2),
+            (2, -2),
+            (-2, -2)
+        ]
+
+class camel(piece):
+    def __init__(self):
+        self.name = camel
+        self.moves = [
+            (3, 0),
+            (0, 3),
+            (-3, 0),
+            (0, -3)
         ]
 
 def make_spiral(n):
@@ -98,9 +126,18 @@ def make_spiral(n):
 def check_bounds(n, base, move_list):
     valid_moves = []
     for move in move_list:
-        y_pos = base[0] + move[0]
+        y_pos = base[0] - move[0]
         x_pos = base[1] + move[1]
-        if y_pos >= 0 and y_pos < n and x_pos >=0 and x_pos < n:
+        if y_pos >= 0 and y_pos < n and x_pos >= 0 and x_pos < n:
+            valid_moves.append((y_pos, x_pos))
+    return valid_moves
+
+def check_bounds_invert(n, base, move_list):
+    valid_moves = []
+    for move in move_list:
+        y_pos = base[0] + move[0]
+        x_pos = base[1] - move[1]
+        if y_pos >=0 and y_pos < n and x_pos >= 0 and x_pos < n:
             valid_moves.append((y_pos, x_pos))
     return valid_moves
 
@@ -118,13 +155,22 @@ def play(n, grid, spaces, players_list):
             if spaces[smallest_squares[player]].occupant != 0:
                 smallest_squares[player] += 1
             else:
-                visible = check_bounds(n, spaces[smallest_squares[player]].pos, players_list[player].moves)
+                # visible = check_bounds(n, spaces[smallest_squares[player]].pos, players_list[player].moves)
                 valid_flag = 1
-                for move in visible:
-                    owner = spaces[grid[move[0]][move[1]]].occupant
-                    if owner != 0 and owner != player_num[player]:
-                        valid_flag = 0
-                        break
+                # for move in visible:
+                #     owner = spaces[grid[move[0]][move[1]]].occupant
+                #     if owner != 0 and owner != player_num[player]:
+                #         valid_flag = 0
+                #         break
+                other_players = player_num.copy()
+                other_players.remove(other_players[player])
+                for op in other_players:
+                    visible = check_bounds_invert(n, spaces[smallest_squares[player]].pos, players_list[op - 1].moves)
+                    for move in visible:
+                        owner = spaces[grid[move[0]][move[1]]].occupant
+                        if owner == op:
+                            valid_flag = 0
+                            break
                 if valid_flag == 0:
                     smallest_squares[player] += 1
                 else:
@@ -154,13 +200,31 @@ def outcome_2_knights(n):
 
     return grid
 
-def outcome_6_knights(n):
+def outcome_elephant_camel(n):
     grid, spaces = make_spiral(n)
 
     plist = []
-    plist.append(knight())
-    plist.append(knight())
-    plist.append(knight())
+
+    plist.append(elephant())
+    plist.append(camel())
+
+    play(n, grid, spaces, plist)
+
+    for i in range(n):
+        for j in range(n):
+            grid[i][j] = 0
+
+    for i in range(n ** 2):
+        y = spaces[i].y
+        x = spaces[i].x 
+        grid[y][x] = spaces[i].occupant
+
+    return grid
+
+def outcome_3_knights(n):
+    grid, spaces = make_spiral(n)
+
+    plist = []
     plist.append(knight())
     plist.append(knight())
     plist.append(knight())
@@ -177,6 +241,19 @@ def outcome_6_knights(n):
         grid[y][x] = spaces[i].occupant
 
     return grid
+
+def load(file_name):
+    with open(os.path.join("./pieces", file_name)) as f:
+        data = f.read()
+    move_list = []
+    lines = data.split("\n")
+    for line in lines:
+        pos = line.split(",")
+        move_list.append((int(pos[0]), int(pos[1])))
+    return move_list
+
+
+
 
 # n = 230
 # grid = outcome_2_knights(n)
@@ -224,6 +301,8 @@ def outcome_6_knights(n):
 # #     y = spaces[i].y
 # #     x = spaces[i].x 
 # #     grid[y][x] = spaces[i].occupant
+
+# grid = outcome_elephant_camel(200)
 
 # for line in grid:
 #     #out = ""
