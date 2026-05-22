@@ -10,9 +10,10 @@ class space:
         self.occupant = 0
 
 class piece:
-    def __init__(self, name):
+    def __init__(self, name, move_list):
         self.name = name
-        self.moves = []
+        self.moves = move_list
+
 
 class knight(piece):
     def __init__(self):
@@ -179,6 +180,21 @@ def play(n, grid, spaces, players_list):
                     break
         player = (player + 1) % player_count
 
+def outcome(n, plist):
+    grid, spaces = make_spiral(n)
+
+    play(n, grid, spaces, plist)
+
+    for i in range(n):
+        for j in range(n):
+            grid[i][j] = 0
+
+    for i in range(n ** 2):
+        y = spaces[i].y
+        x = spaces[i].x 
+        grid[y][x] = spaces[i].occupant
+
+    return grid
 
 def outcome_2_knights(n):
     grid, spaces = make_spiral(n)

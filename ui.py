@@ -8,6 +8,8 @@ class mainwindow():
 
         self.root = root
 
+        self.open_window = []
+
         mainframe = Frame(root)
         mainframe.grid(row = 0, column = 1)
 
@@ -49,7 +51,7 @@ class mainwindow():
         buttonframe = Frame(sideframe)
         buttonframe.grid(row = 2, column = 0, sticky = "S")
 
-        Button(buttonframe, width = 15, text = "draw", command = self.draw).grid(row = 0, column = 0, padx = 5, pady = 10)
+        Button(buttonframe, width = 15, text = "draw", command = self.draw2).grid(row = 0, column = 0, padx = 5, pady = 10)
         Button(buttonframe, width = 15, text = "clear", command = self.clear).grid(row = 0, column = 1)
         Button(buttonframe, width = 15, text = "make piece", command = self.make).grid(row = 1, column = 0)
         Button(buttonframe, width = 15, text = "view piece", command = self.check).grid(row = 1, column = 1)
@@ -61,10 +63,14 @@ class mainwindow():
         self.canvas.create_rectangle(0, 0, 1000, 1000, outline = "white", fill = "white")
 
     def make(self):
-        make_piece_window(self.root)
+        for window in self.open_window:
+            window.destroy()
+        make_piece_window(self.root, self.open_window)
 
     def check(self):
-        view_piece_window(self.root)
+        for window in self.open_window:
+            window.destroy()
+        view_piece_window(self.root, self.open_window)
 
     def set_piece_options(self):
         files = []
@@ -124,9 +130,42 @@ class mainwindow():
                     color = "purple"
                 self.canvas.create_rectangle(j, i, j + 1, i + 1, outline = color)
 
+    def draw2(self):
+        self.clear()
+        n = 1000
+        plist = []
+        for box in self.piece_boxes:
+            if box.get() != "none":
+                file_name = box.get() + ".txt"
+                move_list = load(file_name)
+                plist.append(piece(box.get(), move_list))
+        grid = outcome(n, plist)
+        color = self.color_boxes[6].get()
+        for i in range(n):
+            for j in range(n):
+                flag = grid[i][j]
+                if flag == 0:
+                    color = self.color_boxes[6].get()
+                elif flag == 1:
+                    color = self.color_boxes[0].get()
+                elif flag == 2:
+                    color = self.color_boxes[1].get()
+                elif flag == 3:
+                    color = self.color_boxes[2].get()
+                elif flag == 4:
+                    color = self.color_boxes[3].get()
+                elif flag == 5:
+                    color = self.color_boxes[4].get()
+                elif flag == 6:
+                    color = self.color_boxes[5].get()
+                self.canvas.create_rectangle(j, i, j + 1, i + 1, outline = color)
+
+
 class view_piece_window():
-    def __init__(self, root):
+    def __init__(self, root, open_window):
         window = Toplevel(root)
+
+        open_window.append(window)
 
         mainframe = Frame(window)
         mainframe.grid(row = 1, column = 0)
@@ -182,10 +221,12 @@ class view_piece_window():
 
 
 class make_piece_window():
-    def __init__(self, root):
+    def __init__(self, root, open_window):
 
         window = Toplevel(root)
         self.window = window
+
+        open_window.append(window)
 
         mainframe = Frame(self.window)
         mainframe.grid(row = 1, column = 0)
