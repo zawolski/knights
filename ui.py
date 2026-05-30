@@ -3,6 +3,7 @@ from tkinter import ttk
 from test import *
 import os
 
+
 class mainwindow():
     def __init__(self, root):
 
@@ -41,7 +42,7 @@ class mainwindow():
         for i in range(7):
             self.color_boxes[i] = ttk.Combobox(entryframe, width = 15, textvariable = self.color_vars[i])
             self.color_boxes[i].grid(row = i + 1, column = 1, pady = 10)
-            self.color_boxes[i].state(["readonly"])
+            #self.color_boxes[i].state(["readonly"])
             self.color_boxes[i]["values"] = tuple(c_list)
             self.color_vars[i].set(c_list[i])
             self.color_boxes[i].set(c_list[i])
@@ -65,7 +66,7 @@ class mainwindow():
     def make(self):
         for window in self.open_window:
             window.destroy()
-        make_piece_window(self.root, self.open_window)
+        make_piece_window(self.root, self.open_window, self)
 
     def check(self):
         for window in self.open_window:
@@ -104,62 +105,106 @@ class mainwindow():
         ]
         return c_list
 
-    def draw(self):
-        self.clear()
-        n = 1000
-        # grid = outcome_2_knights(n)
-        grid = outcome_3_knights(n)
-        # grid = outcome_elephant_camel(n)
-        color = "white"
-        for i in range(n):
-            for j in range(n):
-                flag = grid[i][j]
-                if flag == 0:
-                    color = "white"
-                elif flag == 1:
-                    color = "black"
-                elif flag == 2:
-                    color = "yellow"
-                elif flag == 3:
-                    color = "blue"
-                elif flag == 4:
-                    color = "green"
-                elif flag == 5:
-                    color = "yellow"
-                elif flag == 6:
-                    color = "purple"
-                self.canvas.create_rectangle(j, i, j + 1, i + 1, outline = color)
+    # def draw(self):
+    #     self.clear()
+    #     n = 1000
+    #     # grid = outcome_2_knights(n)
+    #     grid = outcome_3_knights(n)
+    #     # grid = outcome_elephant_camel(n)
+    #     color = "white"
+    #     for i in range(n):
+    #         for j in range(n):
+    #             flag = grid[i][j]
+    #             if flag == 0:
+    #                 color = "white"
+    #             elif flag == 1:
+    #                 color = "black"
+    #             elif flag == 2:
+    #                 color = "yellow"
+    #             elif flag == 3:
+    #                 color = "blue"
+    #             elif flag == 4:
+    #                 color = "green"
+    #             elif flag == 5:
+    #                 color = "yellow"
+    #             elif flag == 6:
+    #                 color = "purple"
+    #             self.canvas.create_rectangle(j, i, j + 1, i + 1, outline = color)
+
+    def single_color_check(self, c_string):
+        widget = self.root
+        try:
+            widget.winfo_rgb(c_string)
+            return True
+        except:
+            return False
+
+    def full_color_check(self):
+        bad_colors = []
+        for i in range(7):
+            if not self.single_color_check(self.color_boxes[i].get()):
+                bad_colors.append(i)
+        return bad_colors
+
 
     def draw2(self):
+        for window in self.open_window:
+            window.destroy()
         self.clear()
-        n = 1000
-        plist = []
-        for box in self.piece_boxes:
-            if box.get() != "none":
-                file_name = box.get() + ".txt"
-                move_list = load(file_name)
-                plist.append(piece(box.get(), move_list))
-        grid = outcome(n, plist)
-        color = self.color_boxes[6].get()
-        for i in range(n):
-            for j in range(n):
-                flag = grid[i][j]
-                if flag == 0:
-                    color = self.color_boxes[6].get()
-                elif flag == 1:
-                    color = self.color_boxes[0].get()
-                elif flag == 2:
-                    color = self.color_boxes[1].get()
-                elif flag == 3:
-                    color = self.color_boxes[2].get()
-                elif flag == 4:
-                    color = self.color_boxes[3].get()
-                elif flag == 5:
-                    color = self.color_boxes[4].get()
-                elif flag == 6:
-                    color = self.color_boxes[5].get()
-                self.canvas.create_rectangle(j, i, j + 1, i + 1, outline = color)
+        bad_colors = self.full_color_check()
+        if len(bad_colors) == 0:
+            n = 1000
+            plist = []
+            for box in self.piece_boxes:
+                if box.get() != "none":
+                    file_name = box.get() + ".txt"
+                    move_list = load(file_name)
+                    plist.append(piece(box.get(), move_list))
+            grid = outcome(n, plist)
+            color = self.color_boxes[6].get()
+            for i in range(n):
+                for j in range(n):
+                    flag = grid[i][j]
+                    if flag == 0:
+                        color = self.color_boxes[6].get()
+                    elif flag == 1:
+                        color = self.color_boxes[0].get()
+                    elif flag == 2:
+                        color = self.color_boxes[1].get()
+                    elif flag == 3:
+                        color = self.color_boxes[2].get()
+                    elif flag == 4:
+                        color = self.color_boxes[3].get()
+                    elif flag == 5:
+                        color = self.color_boxes[4].get()
+                    elif flag == 6:
+                        color = self.color_boxes[5].get()
+                    self.canvas.create_rectangle(j, i, j + 1, i + 1, outline = color)
+        else:
+            bad_color_window(self.root, self.open_window, bad_colors)
 
+class bad_color_window:
+    def __init__(self, root, open_window, bad_colors):
+        window = Toplevel(root)
+        open_window.append(window)
+        self.window = window
+
+        mainframe = Frame(window)
+        mainframe.grid(row = 0, column = 0)
+
+        Label(mainframe, text = "The following pieces have invalid colors:").grid(row = 0, column = 0)
+        
+        for i in range(6):
+            if i in bad_colors:
+                Label(mainframe, text = f"Piece {i + 1}").grid(row = i + 1, column = 0)
+
+        if 6 in bad_colors:
+            Label(mainframe, text = "Background").grid(row = 7, column = 0)
+
+        Button(mainframe, text = "Okay", command = self.close_window).grid(row = 8, column = 0)
+
+    def close_window(self):
+        self.window.destroy()
 
 class view_piece_window():
     def __init__(self, root, open_window):
@@ -221,7 +266,8 @@ class view_piece_window():
 
 
 class make_piece_window():
-    def __init__(self, root, open_window):
+    def __init__(self, root, open_window, prev):
+        self.prev = prev
 
         window = Toplevel(root)
         self.window = window
@@ -274,6 +320,7 @@ class make_piece_window():
         else:
             with open(os.path.join(save_path, self.new_file), 'w') as f:
                 f.write(self.data)
+            self.prev.set_piece_options()
             self.window.destroy()
 
 class overwrite_window:
